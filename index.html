@@ -188,14 +188,14 @@
         let currentStationIndex = -1;
         let playTimeout = null; 
 
-        // TWOJE LINKI DROPBOX
+        // TWOJE ORYGINALNE LINKI DROPBOX BEZ ZMIAN
         const defaultStations = [
-            { id: 1, name: "Select FM", img: "station1.png", src: "https://www.dropbox.com/scl/fi/obsh5t9x4dtczycdwtsdw/station1.mp3?rlkey=uecqgdw5qulm0bbnhpftu79yk&st=vd5zxhl8&raw=1" },
-            { id: 2, name: "Ambience 103.9", img: "station2.png", src: "https://www.dropbox.com/scl/fi/8yjpfpx4a4x96rwasgg31/station2.mp3?rlkey=5fv9qjnjfqu3wfpsqkuvib4x7&st=lprzq7xb&raw=1" },
-            { id: 3, name: "WeRock 102.1", img: "station3.png", src: "https://www.dropbox.com/scl/fi/1ysp37r3k199rn1mhhhnh/station3.mp3?rlkey=9u4gk8cx43fko6lvjjrb47wfv&st=hxhkd7xs&raw=1" },
-            { id: 4, name: "Rap 105.8", img: "station4.png", src: "https://www.dropbox.com/scl/fi/j2ctqhm7i1v6ho7x307y6/station4.mp3?rlkey=17nt6x48osye4klkcvftjga6b&st=t2qikghr&raw=1" },
-            { id: 5, name: "Sandomierz 109.8", img: "station5.png", src: "https://www.dropbox.com/scl/fi/o7dmjcf4tr22sog0i8b8o/station5.mp3?rlkey=90mjr9kchijp7vpx76mkzglrp&st=s3ayqqlf&raw=1" },
-            { id: 6, name: "Boards of Sandomierz", img: "station6.png", src: "https://www.dropbox.com/scl/fi/aqcyetmimfnbpuixjbw01/station6.mp3?rlkey=aw5ev63t4ettekowyp4uyiarp&st=bfv9sawe&raw=1" }
+            { id: 1, name: "Select FM", img: "station1.png", src: "https://www.dropbox.com/scl/fi/obsh5t9x4dtczycdwtsdw/station1.mp3?rlkey=uecqgdw5qulm0bbnhpftu79yk&st=vd5zxhl8&dl=0?raw=1" },
+            { id: 2, name: "Ambience 103.9", img: "station2.png", src: "https://www.dropbox.com/scl/fi/8yjpfpx4a4x96rwasgg31/station2.mp3?rlkey=5fv9qjnjfqu3wfpsqkuvib4x7&st=lprzq7xb&dl=0?raw=1" },
+            { id: 3, name: "WeRock 102.1", img: "station3.png", src: "https://www.dropbox.com/scl/fi/1ysp37r3k199rn1mhhhnh/station3.mp3?rlkey=9u4gk8cx43fko6lvjjrb47wfv&st=hxhkd7xs&dl=0?raw=1" },
+            { id: 4, name: "Rap 105.8", img: "station4.png", src: "https://www.dropbox.com/scl/fi/j2ctqhm7i1v6ho7x307y6/station4.mp3?rlkey=17nt6x48osye4klkcvftjga6b&st=t2qikghr&dl=0?raw=1" },
+            { id: 5, name: "Sandomierz 109.8", img: "station5.png", src: "https://www.dropbox.com/scl/fi/o7dmjcf4tr22sog0i8b8o/station5.mp3?rlkey=90mjr9kchijp7vpx76mkzglrp&st=s3ayqqlf&dl=0?raw=1" },
+            { id: 6, name: "Boards of Sandomierz", img: "station6.png", src: "https://www.dropbox.com/scl/fi/aqcyetmimfnbpuixjbw01/station6.mp3?rlkey=aw5ev63t4ettekowyp4uyiarp&st=bfv9sawe&dl=0?raw=1" }
         ];
 
         let stations = JSON.parse(localStorage.getItem('saved_stations')) || defaultStations;
