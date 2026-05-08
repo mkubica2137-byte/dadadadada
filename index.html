@@ -12,6 +12,7 @@
             --gta-white: #c9d0d4;
             --power-off: #222;
             --signal-green: #2ecc71;
+            --signal-warn: #f39c12;
         }
 
         body {
@@ -86,37 +87,73 @@
             margin-bottom: 20px;
             height: 15px;
             letter-spacing: 1px;
+            text-transform: uppercase;
         }
 
-        .stations-container { display: flex; gap: 20px; margin-bottom: 30px; align-items: flex-end; flex-wrap: wrap; justify-content: center; max-width: 800px; transition: 0.3s; }
+        .stations-container { display: flex; gap: 20px; margin-bottom: 30px; align-items: flex-end; flex-wrap: wrap; justify-content: center; max-width: 800px; transition: 0.3s; z-index: 20;}
         
         .station { width: 80px; display: flex; flex-direction: column; align-items: center; cursor: pointer; transition: all 0.2s ease; }
-        .station img { width: 65px; height: 65px; object-fit: contain; opacity: 0.4; transition: 0.2s; }
+        .station img { width: 65px; height: 65px; object-fit: contain; opacity: 0.4; transition: 0.2s; border-radius: 10px;}
         .station-name { font-size: 0.55rem; color: #fff; text-align: center; margin-top: 10px; opacity: 0; text-transform: uppercase; }
         .station:hover img { opacity: 0.8; transform: scale(1.1); }
-        .station.active img { opacity: 1; transform: scale(1.15); filter: drop-shadow(0px 0px 8px rgba(255, 255, 255, 0.4)); }
+        .station.active img { opacity: 1; transform: scale(1.15); filter: drop-shadow(0px 0px 10px rgba(255, 255, 255, 0.6)); border: 2px solid var(--gta-white);}
         .station:hover .station-name, .station.active .station-name { opacity: 1; }
 
         /* Power & Volume */
-        .gta-slider-label { color: var(--gta-blue); font-size: 0.7rem; margin-bottom: 5px; text-transform: uppercase; }
-        .gta-volume-bar { display: flex; gap: 4px; }
-        .volume-block { width: 12px; height: 18px; background-color: #1a1a1a; border: 1px solid #000; cursor: pointer; }
+        .gta-slider-label { color: var(--gta-blue); font-size: 0.7rem; margin-bottom: 5px; text-transform: uppercase; text-align: center; }
+        .gta-volume-bar { display: flex; gap: 4px; justify-content: center; z-index: 20;}
+        .volume-block { width: 12px; height: 18px; background-color: #1a1a1a; border: 1px solid #000; cursor: pointer; transition: 0.1s;}
         .volume-block.active { background-color: var(--gta-white); box-shadow: 0 0 5px var(--gta-white); }
 
-        .power-btn { margin-top: 20px; padding: 10px 20px; border: 2px solid var(--gta-blue); color: var(--gta-blue); background: transparent; font-family: 'Michroma'; font-size: 0.7rem; cursor: pointer; transition: 0.3s; }
-        .power-btn.on { color: #fff; background: #a22; border-color: #f55; }
+        .controls-wrapper { display: flex; flex-direction: column; align-items: center; z-index: 20; gap: 20px; }
+
+        .power-btn { padding: 10px 20px; border: 2px solid var(--gta-blue); color: var(--gta-blue); background: rgba(0,0,0,0.5); font-family: 'Michroma'; font-size: 0.7rem; cursor: pointer; transition: 0.3s; text-transform: uppercase;}
+        .power-btn.on { color: #fff; background: #a22; border-color: #f55; text-shadow: 0 0 5px #fff; box-shadow: 0 0 10px rgba(255, 85, 85, 0.4);}
+
+        /* GTA HUD (Bottom Right) */
+        .hud {
+            position: absolute;
+            bottom: 30px; right: 40px;
+            text-align: right;
+            z-index: 20;
+        }
+        .hud-time { font-size: 2.5rem; color: var(--gta-white); text-shadow: 3px 3px 0 #000; letter-spacing: 2px; margin-bottom: 5px; }
+        .hud-now-playing { font-size: 0.7rem; color: var(--signal-green); text-transform: uppercase; letter-spacing: 1px; display: none; text-shadow: 1px 1px 0 #000;}
+        
+        /* EQ Visualizer */
+        .eq { display: none; gap: 4px; height: 20px; align-items: flex-end; justify-content: flex-end; margin-top: 8px;}
+        .eq .bar { width: 5px; background: var(--signal-green); animation: bounce 0.5s infinite alternate; box-shadow: 0 0 5px var(--signal-green);}
+        .eq .bar:nth-child(1) { animation-delay: 0.0s; }
+        .eq .bar:nth-child(2) { animation-delay: 0.2s; }
+        .eq .bar:nth-child(3) { animation-delay: 0.4s; }
+        .eq .bar:nth-child(4) { animation-delay: 0.1s; }
+        .eq .bar:nth-child(5) { animation-delay: 0.3s; }
+        
+        @keyframes bounce { 
+            0% { height: 4px; } 
+            100% { height: 20px; } 
+        }
+
+        body.is-playing .eq { display: flex; }
+        body.is-playing .hud-now-playing { display: block; }
+
+        /* Keyboard Hints */
+        .keyboard-hints {
+            position: absolute; bottom: 20px; left: 30px;
+            font-size: 0.5rem; color: #555; letter-spacing: 1px; text-transform: uppercase; line-height: 1.6;
+        }
 
         /* Mobile Overlay */
-        #start-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.95); color: white; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; z-index: 100; cursor: pointer; text-align: center; padding: 20px;}
+        #start-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.95); color: white; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; z-index: 100; cursor: pointer; text-align: center; padding: 20px; text-transform: uppercase; letter-spacing: 2px;}
         #background-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.85); backdrop-filter: blur(10px); z-index: 999; display: none; flex-direction: column; align-items: center; justify-content: center; color: var(--gta-white); text-align: center; }
 
         /* Context Menu */
-        #custom-menu { position: fixed; background: #111; border: 1px solid var(--gta-blue); padding: 10px 0; z-index: 1000; display: none; box-shadow: 5px 5px 15px rgba(0,0,0,0.5); }
-        .menu-item { padding: 8px 25px; font-size: 0.7rem; color: var(--gta-white); cursor: pointer; text-transform: uppercase; }
+        #custom-menu { position: fixed; background: #111; border: 1px solid var(--gta-blue); padding: 10px 0; z-index: 1000; display: none; box-shadow: 5px 5px 15px rgba(0,0,0,0.8); }
+        .menu-item { padding: 10px 25px; font-size: 0.7rem; color: var(--gta-white); cursor: pointer; text-transform: uppercase; }
         .menu-item:hover { background: var(--gta-blue); color: #fff; }
 
         /* Power Off Filter */
-        body.power-off .stations-container, body.power-off .title, body.power-off .menu-text, body.power-off #signal-status { filter: grayscale(1) brightness(0.2); pointer-events: none; }
+        body.power-off .stations-container, body.power-off .title, body.power-off .menu-text, body.power-off #signal-status, body.power-off .hud { filter: grayscale(1) brightness(0.2); pointer-events: none; }
 
         /* Tuning Animation */
         @keyframes tuningShake {
@@ -126,12 +163,14 @@
             75% { transform: translate(1px, -2px); }
             100% { transform: translate(0,0); }
         }
-        .is-tuning .station.active { animation: tuningShake 0.1s infinite; }
+        .is-tuning .station.active { animation: tuningShake 0.1s infinite; border-color: var(--signal-warn); }
 
         @media (max-width: 768px) {
             .title { font-size: 2.2rem; top: 20px; left: 20px; }
             .corner-art { width: 180px; height: 220px; opacity: 0.4; }
             .menu-text { margin-top: 60px; }
+            .hud { bottom: 100px; right: 20px; }
+            .keyboard-hints { display: none; }
         }
     </style>
 </head>
@@ -146,18 +185,34 @@
     </div>
 
     <div class="corner-art" id="corner-art"></div>
+    
     <h1 class="title">Sandomierz Radio</h1>
     <div class="menu-text">Stacja Radiowa</div>
     <div id="signal-status">SYGNAŁ: BRAK</div>
 
     <div class="stations-container" id="stations-list"></div>
 
-    <div class="volume-container">
-        <div class="gta-slider-label">Poziom Głośności</div>
-        <div class="gta-volume-bar" id="gta-slider"></div>
+    <div class="controls-wrapper">
+        <div class="volume-container">
+            <div class="gta-slider-label">Poziom Głośności</div>
+            <div class="gta-volume-bar" id="gta-slider"></div>
+        </div>
+        <button class="power-btn" id="power-toggle">ZASILANIE: WYŁ</button>
     </div>
 
-    <button class="power-btn" id="power-toggle">ZASILANIE: WYŁ</button>
+    <div class="hud">
+        <div class="hud-time" id="clock">00:00</div>
+        <div class="hud-now-playing" id="now-playing">Tuning...</div>
+        <div class="eq">
+            <span class="bar"></span><span class="bar"></span><span class="bar"></span><span class="bar"></span><span class="bar"></span>
+        </div>
+    </div>
+
+    <div class="keyboard-hints">
+        [SPACJA] Zasilanie<br>
+        [A] / [D] Zmiana Stacji<br>
+        [SCROLL] Głośność
+    </div>
 
     <div id="custom-menu">
         <div class="menu-item" onclick="addNewStation()">+ Dodaj Nową Stację</div>
@@ -177,6 +232,8 @@
         const overlay = document.getElementById('start-overlay');
         const signalStatus = document.getElementById('signal-status');
         const noiseLayer = document.getElementById('noise-layer');
+        const clockEl = document.getElementById('clock');
+        const nowPlayingEl = document.getElementById('now-playing');
         
         let isPowerOn = false;
         let masterVolume = 0.5;
@@ -184,23 +241,31 @@
         let activeAudios = {}; 
         let playTimeout = null; 
 
-        // TWOJE LINKI DROPBOX (ZAKTUALIZOWANE)
+        // RESTORED ORIGINAL IMAGES
         const defaultStations = [
             { id: 1, name: "Select FM", img: "station1.png", src: "https://www.dropbox.com/scl/fi/obsh5t9x4dtczycdwtsdw/station1.mp3?rlkey=uecqgdw5qulm0bbnhpftu79yk&st=vd5zxhl8&raw=1" },
             { id: 2, name: "Ambience 103.9", img: "station2.png", src: "https://www.dropbox.com/scl/fi/8yjpfpx4a4x96rwasgg31/station2.mp3?rlkey=5fv9qjnjfqu3wfpsqkuvib4x7&st=lprzq7xb&raw=1" },
             { id: 3, name: "WeRock 102.1", img: "station3.png", src: "https://www.dropbox.com/scl/fi/1ysp37r3k199rn1mhhhnh/station3.mp3?rlkey=9u4gk8cx43fko6lvjjrb47wfv&st=hxhkd7xs&raw=1" },
             { id: 4, name: "Rap 105.8", img: "station4.png", src: "https://www.dropbox.com/scl/fi/j2ctqhm7i1v6ho7x307y6/station4.mp3?rlkey=17nt6x48osye4klkcvftjga6b&st=t2qikghr&raw=1" },
             { id: 5, name: "Sandomierz 109.8", img: "station5.png", src: "https://www.dropbox.com/scl/fi/o7dmjcf4tr22sog0i8b8o/station5.mp3?rlkey=90mjr9kchijp7vpx76mkzglrp&st=s3ayqqlf&raw=1" },
-            { id: 6, name: "Boards of Sandomierz", img: "station6.png", src: "https://www.dropbox.com/scl/fi/aqcyetmimfnbpuixjbw01/station6.mp3?rlkey=aw5ev63t4ettekowyp4uyiarp&st=bfv9sawe&raw=1" }
+            { id: 6, name: "Boards of Sandomierz", img: "station6.png", src: "https://www.dropbox.com/scl/fi/aqcyetmimfnbpuixjbw01/station6.mp3?rlkey=aw5ev63t4ettekowyp4uyiarp&st=bfv9sawe&raw=1" },
+            { id: 7, name: "Eectro Max 102.1", img: "station7.png", src: "https://www.dropbox.com/scl/fi/4spnv26bmuisye9yory4o/station7.mp3?rlkey=m4povij6hj4exea041t1psl7x&st=h87fd8cz&raw=1" }
         ];
 
         let stations = JSON.parse(localStorage.getItem('saved_stations')) || defaultStations;
 
+        // INITIALIZE CLOCK
+        setInterval(() => {
+            const d = new Date();
+            clockEl.innerText = d.toLocaleTimeString('pl-PL', { hour: '2-digit', minute: '2-digit' });
+        }, 1000);
+
         // INITIALIZE ART & VOLUME
         (function init() {
+            // RESTORED RANDOM CORNER ART
             const art = document.getElementById('corner-art');
             art.style.backgroundImage = `url('${cornerArtImages[Math.floor(Math.random() * cornerArtImages.length)]}')`;
-            
+
             const slider = document.getElementById('gta-slider');
             for (let i = 0; i < 15; i++) {
                 const b = document.createElement('div');
@@ -215,7 +280,9 @@
             masterVolume = val;
             document.querySelectorAll('.volume-block').forEach((b, i) => b.classList.toggle('active', i < val * 15));
             staticSound.volume = masterVolume * 0.4;
-            if (currentStationIndex !== -1 && activeAudios[currentStationIndex]) activeAudios[currentStationIndex].volume = masterVolume;
+            if (currentStationIndex !== -1 && activeAudios[currentStationIndex]) {
+                activeAudios[currentStationIndex].volume = masterVolume;
+            }
         }
 
         function renderStations() {
@@ -225,9 +292,20 @@
                 div.className = `station ${currentStationIndex === i ? 'active' : ''}`;
                 div.innerHTML = `<img src="${s.img}" onerror="this.src='https://cdn-icons-png.flaticon.com/512/301/301541.png'"><span class="station-name">${s.name}</span>`;
                 div.onclick = () => playStation(i);
-                div.onmouseenter = () => { uiHover.currentTime = 0; uiHover.play(); };
+                div.onmouseenter = () => { 
+                    uiHover.volume = masterVolume * 0.5;
+                    uiHover.currentTime = 0; 
+                    uiHover.play().catch(()=>{}); 
+                };
                 stationsList.appendChild(div);
-                if (!activeAudios[i]) { activeAudios[i] = new Audio(s.src); activeAudios[i].loop = true; }
+                
+                // Preload metadata for STREAM SYNC
+                if (!activeAudios[i]) { 
+                    let a = new Audio(s.src);
+                    a.preload = "metadata"; 
+                    a.loop = true;
+                    activeAudios[i] = a; 
+                }
             });
         }
 
@@ -238,43 +316,61 @@
             currentStationIndex = index;
             renderStations();
 
+            // Stop all other audios completely to save bandwidth
+            Object.values(activeAudios).forEach(a => { a.pause(); });
+            document.body.classList.remove('is-playing');
+
             // REALISTIC TUNING START
             signalStatus.innerText = "DOSTRAJANIE: SZUKANIE SYGNAŁU...";
-            signalStatus.style.color = "orange";
+            signalStatus.style.color = "var(--signal-warn)";
             noiseLayer.style.opacity = "0.2";
             stationsList.classList.add('is-tuning');
 
-            Object.values(activeAudios).forEach(a => a.volume = 0);
-            staticSound.play();
+            staticSound.currentTime = 0;
+            staticSound.play().catch(()=>{});
 
             playTimeout = setTimeout(() => {
                 staticSound.pause();
                 stationsList.classList.remove('is-tuning');
                 noiseLayer.style.opacity = "0";
 
-                if (isPowerOn && currentStationIndex === index && activeAudios[index]) {
+                if (isPowerOn && currentStationIndex === index) {
                     signalStatus.innerText = "SYGNAŁ: POŁĄCZONO";
                     signalStatus.style.color = "var(--signal-green)";
                     
-                    // FADE IN EFFECT
                     let audio = activeAudios[index];
-                    audio.volume = 0;
-                    audio.play().catch(e => console.log("Blocked"));
                     
-                    let vol = 0;
-                    let fadeIn = setInterval(() => {
-                        vol += 0.1;
-                        if (vol >= masterVolume) {
-                            audio.volume = masterVolume;
-                            clearInterval(fadeIn);
-                        } else {
-                            audio.volume = vol;
-                        }
-                    }, 50);
+                    // --- THE STREAM SYNC MAGIC ---
+                    // Calculates position based on real-world time so tracks seem to run in the background
+                    if (audio.duration) {
+                        let nowSecs = Date.now() / 1000;
+                        audio.currentTime = nowSecs % audio.duration;
+                    }
+                    
+                    audio.volume = 0;
+                    audio.play().then(() => {
+                        document.body.classList.add('is-playing');
+                        nowPlayingEl.innerText = `ODTWARZANIE: ${stations[index].name}`;
+                        
+                        // FADE IN
+                        let vol = 0;
+                        let fadeIn = setInterval(() => {
+                            vol += 0.05;
+                            if (vol >= masterVolume) {
+                                audio.volume = masterVolume;
+                                clearInterval(fadeIn);
+                            } else {
+                                audio.volume = vol;
+                            }
+                        }, 50);
+                    }).catch(e => {
+                        signalStatus.innerText = "BŁĄD ODTWARZANIA";
+                        signalStatus.style.color = "red";
+                    });
 
                     updateMetadata(index);
                 }
-            }, 1500);
+            }, 1200); // slightly faster tuning
         }
 
         function updateMetadata(index) {
@@ -294,26 +390,63 @@
             powerBtn.classList.toggle('on', isPowerOn);
 
             if (!isPowerOn) {
-                Object.values(activeAudios).forEach(a => { a.pause(); a.volume = 0; });
+                Object.values(activeAudios).forEach(a => { a.pause(); });
                 staticSound.pause();
                 signalStatus.innerText = "SYGNAŁ: BRAK";
+                document.body.classList.remove('is-playing');
+                if(playTimeout) clearTimeout(playTimeout);
             } else {
-                if (currentStationIndex === -1) signalStatus.innerText = "WYBIERZ STACJĘ";
-                Object.values(activeAudios).forEach(a => { a.play().then(() => a.volume = 0).catch(() => {}); });
+                if (currentStationIndex === -1) {
+                    signalStatus.innerText = "WYBIERZ STACJĘ";
+                    signalStatus.style.color = "var(--gta-white)";
+                } else {
+                    // Force replay of current station
+                    let tempIndex = currentStationIndex;
+                    currentStationIndex = -1;
+                    playStation(tempIndex);
+                }
             }
         };
 
         // UI & OVERLAYS
         overlay.onclick = () => { overlay.style.display = 'none'; isPowerOn = true; powerBtn.click(); };
         window.oncontextmenu = (e) => { e.preventDefault(); const m = document.getElementById('custom-menu'); m.style.display = 'block'; m.style.left = e.pageX + 'px'; m.style.top = e.pageY + 'px'; };
-        window.onclick = () => document.getElementById('custom-menu').style.display = 'none';
+        window.onclick = (e) => { if(!e.target.closest('#custom-menu')) document.getElementById('custom-menu').style.display = 'none'; };
+
+        // NEW: KEYBOARD & MOUSE WHEEL CONTROLS
+        window.addEventListener('keydown', (e) => {
+            if (e.code === 'Space') { 
+                e.preventDefault(); 
+                // Bypass the overlay if it's still up
+                if (overlay.style.display !== 'none') overlay.click(); 
+                else powerBtn.click(); 
+            }
+            if (!isPowerOn) return;
+            
+            if (e.code === 'ArrowRight' || e.code === 'KeyD') {
+                let next = currentStationIndex === -1 ? 0 : (currentStationIndex + 1) % stations.length;
+                playStation(next);
+            }
+            if (e.code === 'ArrowLeft' || e.code === 'KeyA') {
+                let prev = currentStationIndex === -1 ? stations.length - 1 : (currentStationIndex - 1 + stations.length) % stations.length;
+                playStation(prev);
+            }
+        });
+
+        window.addEventListener('wheel', (e) => {
+            let newVol = masterVolume + (e.deltaY < 0 ? 0.05 : -0.05);
+            newVol = Math.max(0, Math.min(1, newVol));
+            setVolume(newVol);
+        });
 
         document.addEventListener("visibilitychange", () => {
-            const overlay = document.getElementById('background-overlay');
+            const bgOverlay = document.getElementById('background-overlay');
             if (document.hidden) {
                 document.getElementById('bg-overlay-text').innerHTML = isPowerOn && currentStationIndex !== -1 ? `Gra: ${stations[currentStationIndex].name}` : "Radio uśpione";
-                overlay.style.display = 'flex';
-            } else { overlay.style.display = 'none'; }
+                bgOverlay.style.display = 'flex';
+            } else { 
+                bgOverlay.style.display = 'none'; 
+            }
         });
 
         // LOCKSCREEN CONTROLS
@@ -327,10 +460,20 @@
         function addNewStation() {
             const n = prompt("Nazwa stacji:");
             const u = prompt("URL (MP3):");
-            if (n && u) { stations.push({ id: Date.now(), name: n, img: "custom.png", src: u }); localStorage.setItem('saved_stations', JSON.stringify(stations)); renderStations(); }
+            if (n && u) { 
+                // RESTORED CUSTOM PNG
+                stations.push({ id: Date.now(), name: n, img: "custom.png", src: u }); 
+                localStorage.setItem('saved_stations', JSON.stringify(stations)); 
+                renderStations(); 
+            }
         }
 
-        function resetStations() { if(confirm("Zresetować stacje?")) { localStorage.removeItem('saved_stations'); location.reload(); } }
+        function resetStations() { 
+            if(confirm("Zresetować stacje do domyślnych?")) { 
+                localStorage.removeItem('saved_stations'); 
+                location.reload(); 
+            } 
+        }
 
         renderStations();
     </script>
