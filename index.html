@@ -13,6 +13,7 @@
             --power-off: #222;
             --signal-green: #2ecc71;
             --signal-warn: #f39c12;
+            --signal-mute: #e74c3c;
         }
 
         body {
@@ -29,6 +30,7 @@
             user-select: none;
             background-image: radial-gradient(circle at center, #111 0%, #000 100%);
             cursor: url('cursor.png'), auto;
+            transition: background 1s ease;
         }
 
         /* CRT Scanline Effect */
@@ -42,6 +44,29 @@
             z-index: 10;
             background-size: 100% 4px, 3px 100%;
             pointer-events: none;
+        }
+
+        /* Seasonal Visual Effects */
+        #season-fx {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            pointer-events: none; z-index: 2; opacity: 0; transition: opacity 2s ease;
+        }
+        .fx-summer {
+            box-shadow: inset 0 0 150px rgba(255, 140, 0, 0.15);
+            background: radial-gradient(circle at top right, rgba(255,200,0,0.1), transparent 50%);
+            opacity: 1 !important;
+        }
+        .fx-christmas {
+            background-image: radial-gradient(rgba(255, 255, 255, 0.8) 1px, transparent 1px),
+                              radial-gradient(rgba(255, 255, 255, 0.8) 1px, transparent 1px);
+            background-size: 50px 50px;
+            background-position: 0 0, 25px 25px;
+            animation: snow 10s linear infinite;
+            opacity: 0.3 !important;
+        }
+        @keyframes snow {
+            0% { background-position: 0px 0px, 25px 25px; }
+            100% { background-position: 500px 1000px, 525px 1025px; }
         }
 
         /* Realistic Noise Overlay during tuning */
@@ -64,7 +89,7 @@
             background-size: cover;
             mask-image: linear-gradient(to left, rgb(0, 0, 0) 60%, rgba(0,0,0,0));
             -webkit-mask-image: linear-gradient(to left, rgb(0, 0, 0) 60%, rgba(0,0,0,0));
-            z-index: -1;
+            z-index: 1; /* Pushed behind text, above bg */
         }
 
         .title {
@@ -76,9 +101,10 @@
             top: 30px; left: 50px;
             margin: 0;
             transition: all 0.5s ease;
+            z-index: 20;
         }
 
-        .menu-text { color: var(--gta-blue); letter-spacing: 3px; font-size: 0.8rem; margin-bottom: 5px; text-transform: uppercase; }
+        .menu-text { color: var(--gta-blue); letter-spacing: 3px; font-size: 0.8rem; margin-bottom: 5px; text-transform: uppercase; z-index: 20;}
         
         /* Signal Status Text */
         #signal-status {
@@ -88,15 +114,17 @@
             height: 15px;
             letter-spacing: 1px;
             text-transform: uppercase;
+            z-index: 20;
+            font-weight: bold;
         }
 
         .stations-container { display: flex; gap: 20px; margin-bottom: 30px; align-items: flex-end; flex-wrap: wrap; justify-content: center; max-width: 800px; transition: 0.3s; z-index: 20;}
         
         .station { width: 80px; display: flex; flex-direction: column; align-items: center; cursor: pointer; transition: all 0.2s ease; }
         .station img { width: 65px; height: 65px; object-fit: contain; opacity: 0.4; transition: 0.2s; border-radius: 10px;}
-        .station-name { font-size: 0.55rem; color: #fff; text-align: center; margin-top: 10px; opacity: 0; text-transform: uppercase; }
+        .station-name { font-size: 0.55rem; color: #fff; text-align: center; margin-top: 10px; opacity: 0; text-transform: uppercase; text-shadow: 1px 1px 2px #000;}
         .station:hover img { opacity: 0.8; transform: scale(1.1); }
-        .station.active img { opacity: 1; transform: scale(1.15); filter: drop-shadow(0px 0px 10px rgba(255, 255, 255, 0.6)); border: 2px solid var(--gta-white);}
+        .station.active img { opacity: 1; transform: scale(1.15); filter: drop-shadow(0px 0px 15px rgba(255, 255, 255, 0.8)); border: 2px solid var(--gta-white);}
         .station:hover .station-name, .station.active .station-name { opacity: 1; }
 
         /* Power & Volume */
@@ -104,6 +132,7 @@
         .gta-volume-bar { display: flex; gap: 4px; justify-content: center; z-index: 20;}
         .volume-block { width: 12px; height: 18px; background-color: #1a1a1a; border: 1px solid #000; cursor: pointer; transition: 0.1s;}
         .volume-block.active { background-color: var(--gta-white); box-shadow: 0 0 5px var(--gta-white); }
+        .volume-block.muted { background-color: var(--signal-mute); box-shadow: 0 0 5px var(--signal-mute); }
 
         .controls-wrapper { display: flex; flex-direction: column; align-items: center; z-index: 20; gap: 20px; }
 
@@ -118,11 +147,13 @@
             z-index: 20;
         }
         .hud-time { font-size: 2.5rem; color: var(--gta-white); text-shadow: 3px 3px 0 #000; letter-spacing: 2px; margin-bottom: 5px; }
-        .hud-now-playing { font-size: 0.7rem; color: var(--signal-green); text-transform: uppercase; letter-spacing: 1px; display: none; text-shadow: 1px 1px 0 #000;}
+        .hud-now-playing { font-size: 0.7rem; color: var(--signal-green); text-transform: uppercase; letter-spacing: 1px; display: none; text-shadow: 1px 1px 2px #000;}
         
         /* EQ Visualizer */
         .eq { display: none; gap: 4px; height: 20px; align-items: flex-end; justify-content: flex-end; margin-top: 8px;}
         .eq .bar { width: 5px; background: var(--signal-green); animation: bounce 0.5s infinite alternate; box-shadow: 0 0 5px var(--signal-green);}
+        .eq.muted-eq .bar { background: var(--signal-mute); box-shadow: 0 0 5px var(--signal-mute); animation-play-state: paused; height: 4px;}
+        
         .eq .bar:nth-child(1) { animation-delay: 0.0s; }
         .eq .bar:nth-child(2) { animation-delay: 0.2s; }
         .eq .bar:nth-child(3) { animation-delay: 0.4s; }
@@ -140,8 +171,9 @@
         /* Keyboard Hints */
         .keyboard-hints {
             position: absolute; bottom: 20px; left: 30px;
-            font-size: 0.5rem; color: #555; letter-spacing: 1px; text-transform: uppercase; line-height: 1.6;
+            font-size: 0.55rem; color: #777; letter-spacing: 1px; text-transform: uppercase; line-height: 1.8; z-index: 20; text-shadow: 1px 1px 1px #000;
         }
+        .hint-key { color: var(--gta-blue); font-weight: bold; }
 
         /* Mobile Overlay */
         #start-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.95); color: white; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; z-index: 100; cursor: pointer; text-align: center; padding: 20px; text-transform: uppercase; letter-spacing: 2px;}
@@ -163,7 +195,7 @@
             75% { transform: translate(1px, -2px); }
             100% { transform: translate(0,0); }
         }
-        .is-tuning .station.active { animation: tuningShake 0.1s infinite; border-color: var(--signal-warn); }
+        .is-tuning .station.active { animation: tuningShake 0.1s infinite; border-color: var(--signal-warn); box-shadow: 0 0 20px var(--signal-warn);}
 
         @media (max-width: 768px) {
             .title { font-size: 2.2rem; top: 20px; left: 20px; }
@@ -177,6 +209,8 @@
 <body class="power-off">
 
     <div id="noise-layer"></div>
+    <div id="season-fx"></div> <!-- NEW: Kontener na efekty pór roku -->
+    
     <div id="start-overlay">KLIKNIJ, ABY URUCHOMIĆ SYSTEM RADIOWY</div>
     
     <div id="background-overlay">
@@ -203,15 +237,16 @@
     <div class="hud">
         <div class="hud-time" id="clock">00:00</div>
         <div class="hud-now-playing" id="now-playing">Tuning...</div>
-        <div class="eq">
+        <div class="eq" id="visualizer">
             <span class="bar"></span><span class="bar"></span><span class="bar"></span><span class="bar"></span><span class="bar"></span>
         </div>
     </div>
 
     <div class="keyboard-hints">
-        [SPACJA] Zasilanie<br>
-        [A] / [D] Zmiana Stacji<br>
-        [SCROLL] Głośność
+        <span class="hint-key">[SPACJA]</span> Zasilanie<br>
+        <span class="hint-key">[A] / [D]</span> Zmiana Stacji<br>
+        <span class="hint-key">[SCROLL]</span> Głośność<br>
+        <span class="hint-key">[M]</span> Wycisz (Mute)
     </div>
 
     <div id="custom-menu">
@@ -234,22 +269,66 @@
         const noiseLayer = document.getElementById('noise-layer');
         const clockEl = document.getElementById('clock');
         const nowPlayingEl = document.getElementById('now-playing');
+        const visualizer = document.getElementById('visualizer');
+        const seasonFx = document.getElementById('season-fx');
         
         let isPowerOn = false;
         let masterVolume = 0.5;
+        let preMuteVolume = 0.5;
+        let isMuted = false;
         let currentStationIndex = -1;
         let activeAudios = {}; 
         let playTimeout = null; 
+        let trackInterval = null;
 
-        // RESTORED ORIGINAL IMAGES
+        // Funkcja sprawdzająca porę roku
+        function getSeason() {
+            const date = new Date();
+            const month = date.getMonth() + 1; 
+            const day = date.getDate();
+
+            if (month === 12) return 'christmas';
+            else if (month === 7 || month === 8 || (month === 6 && day >= 21)) return 'summer';
+            return 'normal';
+        }
+
+        const currentSeason = getSeason();
+
+        // Aplikacja efektu pory roku
+        if (currentSeason === 'christmas') seasonFx.classList.add('fx-christmas');
+        else if (currentSeason === 'summer') seasonFx.classList.add('fx-summer');
+
+        // Tablica z warunkowymi linkami i dynamicznymi nazwami utworów (tracks)
         const defaultStations = [
-            { id: 1, name: "Select FM", img: "station1.png", src: "https://www.dropbox.com/scl/fi/obsh5t9x4dtczycdwtsdw/station1.mp3?rlkey=uecqgdw5qulm0bbnhpftu79yk&st=vd5zxhl8&raw=1" },
-            { id: 2, name: "Ambience 103.9", img: "station2.png", src: "https://www.dropbox.com/scl/fi/8yjpfpx4a4x96rwasgg31/station2.mp3?rlkey=5fv9qjnjfqu3wfpsqkuvib4x7&st=lprzq7xb&raw=1" },
-            { id: 3, name: "WeRock 102.1", img: "station3.png", src: "https://www.dropbox.com/scl/fi/1ysp37r3k199rn1mhhhnh/station3.mp3?rlkey=9u4gk8cx43fko6lvjjrb47wfv&st=hxhkd7xs&raw=1" },
-            { id: 4, name: "Rap 105.8", img: "station4.png", src: "https://www.dropbox.com/scl/fi/j2ctqhm7i1v6ho7x307y6/station4.mp3?rlkey=17nt6x48osye4klkcvftjga6b&st=t2qikghr&raw=1" },
-            { id: 5, name: "Sandomierz 109.8", img: "station5.png", src: "https://www.dropbox.com/scl/fi/o7dmjcf4tr22sog0i8b8o/station5.mp3?rlkey=90mjr9kchijp7vpx76mkzglrp&st=s3ayqqlf&raw=1" },
-            { id: 6, name: "Boards of Sandomierz", img: "station6.png", src: "https://www.dropbox.com/scl/fi/aqcyetmimfnbpuixjbw01/station6.mp3?rlkey=aw5ev63t4ettekowyp4uyiarp&st=bfv9sawe&raw=1" },
-            { id: 7, name: "Eectro Max 102.1", img: "station7.png", src: "https://www.dropbox.com/scl/fi/4spnv26bmuisye9yory4o/station7.mp3?rlkey=m4povij6hj4exea041t1psl7x&st=h87fd8cz&raw=1" }
+            { 
+                id: 1, name: "Select FM", img: "station1.png", 
+                src: currentSeason === 'summer' ? "https://www.dropbox.com/scl/fi/e7n72xdl8o1fthbjpzkbh/sel.mp3?rlkey=0rfvv4o0wutf1gq6dlkn9hfne&st=o2u228ua&raw=1" : currentSeason === 'christmas' ? "LINK_SWIETA_1&raw=1" : "https://www.dropbox.com/scl/fi/obsh5t9x4dtczycdwtsdw/station1.mp3?rlkey=uecqgdw5qulm0bbnhpftu79yk&st=vd5zxhl8&raw=1",
+                tracks: ["DJ Flash - Midnight Ride", "Neon Synth - City Lights", "Retro Wave - Ocean View"]
+            },
+            { 
+                id: 2, name: "Ambience 103.9", img: "station2.png", 
+                src: currentSeason === 'summer' ? "https://www.dropbox.com/scl/fi/51q6i90j2cmkvlq1a5mfj/amb.mp3?rlkey=0tasi1pglzots2k9p79qlyo26&st=jdywbcvz&raw=1" : currentSeason === 'christmas' ? "https://www.dropbox.com/scl/fi/51q6i90j2cmkvlq1a5mfj/amb.mp3?rlkey=0tasi1pglzots2k9p79qlyo26&st=jdywbcvz&raw=1" : "https://www.dropbox.com/scl/fi/8yjpfpx4a4x96rwasgg31/station2.mp3?rlkey=5fv9qjnjfqu3wfpsqkuvib4x7&st=lprzq7xb&raw=1"
+            },
+            { 
+                id: 3, name: "WeRock 102.1", img: "station3.png", 
+                src: currentSeason === 'summer' ? "https://www.dropbox.com/scl/fi/0ma987x1qb8bro60b6pol/rck.mp3?rlkey=zee762gpkscaags3qeqyigmw5&st=dvlhakpd&raw=1" : currentSeason === 'christmas' ? "https://www.dropbox.com/scl/fi/0ma987x1qb8bro60b6pol/rck.mp3?rlkey=zee762gpkscaags3qeqyigmw5&st=dvlhakpd&raw=1" : "https://www.dropbox.com/scl/fi/1ysp37r3k199rn1mhhhnh/station3.mp3?rlkey=9u4gk8cx43fko6lvjjrb47wfv&st=hxhkd7xs&raw=1"
+            },
+            { 
+                id: 4, name: "Rap 105.8", img: "station4.png", 
+                src: currentSeason === 'summer' ? "https://www.dropbox.com/scl/fi/1oz1n78bh00kucqpjd7tw/dds.mp3?rlkey=ibj0fe3k7g04vkcctgiaolwg6&st=u9xa9muf&raw=1" : currentSeason === 'christmas' ? "https://www.dropbox.com/scl/fi/1oz1n78bh00kucqpjd7tw/dds.mp3?rlkey=ibj0fe3k7g04vkcctgiaolwg6&st=u9xa9muf&raw=1" : "https://www.dropbox.com/scl/fi/j2ctqhm7i1v6ho7x307y6/station4.mp3?rlkey=17nt6x48osye4klkcvftjga6b&st=t2qikghr&raw=1"
+            },
+            { 
+                id: 5, name: "Sandomierz 109.8", img: "station5.png", 
+                src: currentSeason === 'summer' ? "https://www.dropbox.com/scl/fi/f9z7w2x6mxjjjl01rvrka/sand.mp3?rlkey=z9jeoewuew6z4h5lboj2921ye&st=5k395mea&raw=1" : currentSeason === 'christmas' ? "https://www.dropbox.com/scl/fi/f9z7w2x6mxjjjl01rvrka/sand.mp3?rlkey=z9jeoewuew6z4h5lboj2921ye&st=5k395mea&raw=1" : "https://www.dropbox.com/scl/fi/o7dmjcf4tr22sog0i8b8o/station5.mp3?rlkey=90mjr9kchijp7vpx76mkzglrp&st=s3ayqqlf&raw=1"
+            },
+            { 
+                id: 6, name: "Boards of Sandomierz", img: "station6.png", 
+                src: currentSeason === 'summer' ? "https://www.dropbox.com/scl/fi/a89jya3imby6orrura8ge/zsd.mp3?rlkey=shuj14mtrpcnnlprjxez3ctgy&st=hmjni95s&raw=1" : currentSeason === 'christmas' ? "https://www.dropbox.com/scl/fi/a89jya3imby6orrura8ge/zsd.mp3?rlkey=shuj14mtrpcnnlprjxez3ctgy&st=hmjni95s&raw=1" : "https://www.dropbox.com/scl/fi/aqcyetmimfnbpuixjbw01/station6.mp3?rlkey=aw5ev63t4ettekowyp4uyiarp&st=bfv9sawe&raw=1"
+            },
+            { 
+                id: 7, name: "Eectro Max 102.1", img: "station7.png", 
+                src: currentSeason === 'summer' ? "https://www.dropbox.com/scl/fi/46hoznhytgmk17we6ubao/ele.mp3?rlkey=kt6slts4v0gl28arrcz9gxqrn&st=9eh86cvb&raw=1" : currentSeason === 'christmas' ? "https://www.dropbox.com/scl/fi/46hoznhytgmk17we6ubao/ele.mp3?rlkey=kt6slts4v0gl28arrcz9gxqrn&st=9eh86cvb&raw=1" : "https://www.dropbox.com/scl/fi/4spnv26bmuisye9yory4o/station7.mp3?rlkey=m4povij6hj4exea041t1psl7x&st=h87fd8cz&raw=1"
+            }
         ];
 
         let stations = JSON.parse(localStorage.getItem('saved_stations')) || defaultStations;
@@ -262,7 +341,6 @@
 
         // INITIALIZE ART & VOLUME
         (function init() {
-            // RESTORED RANDOM CORNER ART
             const art = document.getElementById('corner-art');
             art.style.backgroundImage = `url('${cornerArtImages[Math.floor(Math.random() * cornerArtImages.length)]}')`;
 
@@ -270,7 +348,11 @@
             for (let i = 0; i < 15; i++) {
                 const b = document.createElement('div');
                 b.className = 'volume-block';
-                b.onclick = () => setVolume((i + 1) / 15);
+                b.onclick = () => {
+                    isMuted = false;
+                    visualizer.classList.remove('muted-eq');
+                    setVolume((i + 1) / 15);
+                };
                 slider.appendChild(b);
             }
             setVolume(0.5);
@@ -278,10 +360,35 @@
 
         function setVolume(val) {
             masterVolume = val;
-            document.querySelectorAll('.volume-block').forEach((b, i) => b.classList.toggle('active', i < val * 15));
-            staticSound.volume = masterVolume * 0.4;
+            const blocks = document.querySelectorAll('.volume-block');
+            
+            blocks.forEach((b, i) => {
+                b.classList.remove('muted');
+                if (isMuted) {
+                    b.classList.toggle('muted', i < preMuteVolume * 15);
+                    b.classList.remove('active');
+                } else {
+                    b.classList.toggle('active', i < val * 15);
+                }
+            });
+
+            let activeVol = isMuted ? 0 : masterVolume;
+            staticSound.volume = activeVol * 0.4;
             if (currentStationIndex !== -1 && activeAudios[currentStationIndex]) {
-                activeAudios[currentStationIndex].volume = masterVolume;
+                activeAudios[currentStationIndex].volume = activeVol;
+            }
+        }
+
+        function toggleMute() {
+            if (!isPowerOn) return;
+            isMuted = !isMuted;
+            if (isMuted) {
+                preMuteVolume = masterVolume;
+                visualizer.classList.add('muted-eq');
+                setVolume(0);
+            } else {
+                visualizer.classList.remove('muted-eq');
+                setVolume(preMuteVolume);
             }
         }
 
@@ -293,13 +400,12 @@
                 div.innerHTML = `<img src="${s.img}" onerror="this.src='https://cdn-icons-png.flaticon.com/512/301/301541.png'"><span class="station-name">${s.name}</span>`;
                 div.onclick = () => playStation(i);
                 div.onmouseenter = () => { 
-                    uiHover.volume = masterVolume * 0.5;
+                    uiHover.volume = isMuted ? 0 : masterVolume * 0.5;
                     uiHover.currentTime = 0; 
                     uiHover.play().catch(()=>{}); 
                 };
                 stationsList.appendChild(div);
                 
-                // Preload metadata for STREAM SYNC
                 if (!activeAudios[i]) { 
                     let a = new Audio(s.src);
                     a.preload = "metadata"; 
@@ -309,18 +415,38 @@
             });
         }
 
+        function cycleTracks(index) {
+            if (trackInterval) clearInterval(trackInterval);
+            let tracks = stations[index].tracks || [stations[index].name];
+            let currentTrackIdx = 0;
+            
+            nowPlayingEl.innerText = `ODTWARZANIE: ${tracks[currentTrackIdx]}`;
+            
+            trackInterval = setInterval(() => {
+                currentTrackIdx = (currentTrackIdx + 1) % tracks.length;
+                
+                // Fade out/in text effect
+                nowPlayingEl.style.opacity = 0;
+                setTimeout(() => {
+                    nowPlayingEl.innerText = `ODTWARZANIE: ${tracks[currentTrackIdx]}`;
+                    nowPlayingEl.style.opacity = 1;
+                }, 300);
+
+                updateMetadata(index, tracks[currentTrackIdx]);
+            }, 15000); // Zmiana nazwy piosenki co 15 sekund
+        }
+
         function playStation(index) {
             if (!isPowerOn || currentStationIndex === index) return;
             
             if (playTimeout) clearTimeout(playTimeout);
+            if (trackInterval) clearInterval(trackInterval);
             currentStationIndex = index;
             renderStations();
 
-            // Stop all other audios completely to save bandwidth
             Object.values(activeAudios).forEach(a => { a.pause(); });
             document.body.classList.remove('is-playing');
 
-            // REALISTIC TUNING START
             signalStatus.innerText = "DOSTRAJANIE: SZUKANIE SYGNAŁU...";
             signalStatus.style.color = "var(--signal-warn)";
             noiseLayer.style.opacity = "0.2";
@@ -340,8 +466,6 @@
                     
                     let audio = activeAudios[index];
                     
-                    // --- THE STREAM SYNC MAGIC ---
-                    // Calculates position based on real-world time so tracks seem to run in the background
                     if (audio.duration) {
                         let nowSecs = Date.now() / 1000;
                         audio.currentTime = nowSecs % audio.duration;
@@ -350,14 +474,16 @@
                     audio.volume = 0;
                     audio.play().then(() => {
                         document.body.classList.add('is-playing');
-                        nowPlayingEl.innerText = `ODTWARZANIE: ${stations[index].name}`;
                         
-                        // FADE IN
+                        // Uruchomienie rotacji nazw piosenek
+                        cycleTracks(index);
+                        
+                        let targetVol = isMuted ? 0 : masterVolume;
                         let vol = 0;
                         let fadeIn = setInterval(() => {
                             vol += 0.05;
-                            if (vol >= masterVolume) {
-                                audio.volume = masterVolume;
+                            if (vol >= targetVol) {
+                                audio.volume = targetVol;
                                 clearInterval(fadeIn);
                             } else {
                                 audio.volume = vol;
@@ -368,16 +494,17 @@
                         signalStatus.style.color = "red";
                     });
 
-                    updateMetadata(index);
+                    updateMetadata(index, stations[index].tracks ? stations[index].tracks[0] : stations[index].name);
                 }
-            }, 1200); // slightly faster tuning
+            }, 1200); 
         }
 
-        function updateMetadata(index) {
+        function updateMetadata(index, trackName) {
             if ('mediaSession' in navigator) {
                 navigator.mediaSession.metadata = new MediaMetadata({
-                    title: stations[index].name,
-                    artist: 'Sandomierz Radio',
+                    title: trackName,
+                    artist: stations[index].name,
+                    album: 'Sandomierz Radio',
                     artwork: [{ src: stations[index].img, sizes: '512x512', type: 'image/png' }]
                 });
             }
@@ -395,12 +522,12 @@
                 signalStatus.innerText = "SYGNAŁ: BRAK";
                 document.body.classList.remove('is-playing');
                 if(playTimeout) clearTimeout(playTimeout);
+                if(trackInterval) clearInterval(trackInterval);
             } else {
                 if (currentStationIndex === -1) {
                     signalStatus.innerText = "WYBIERZ STACJĘ";
                     signalStatus.style.color = "var(--gta-white)";
                 } else {
-                    // Force replay of current station
                     let tempIndex = currentStationIndex;
                     currentStationIndex = -1;
                     playStation(tempIndex);
@@ -413,11 +540,10 @@
         window.oncontextmenu = (e) => { e.preventDefault(); const m = document.getElementById('custom-menu'); m.style.display = 'block'; m.style.left = e.pageX + 'px'; m.style.top = e.pageY + 'px'; };
         window.onclick = (e) => { if(!e.target.closest('#custom-menu')) document.getElementById('custom-menu').style.display = 'none'; };
 
-        // NEW: KEYBOARD & MOUSE WHEEL CONTROLS
+        // KEYBOARD & MOUSE WHEEL CONTROLS
         window.addEventListener('keydown', (e) => {
             if (e.code === 'Space') { 
                 e.preventDefault(); 
-                // Bypass the overlay if it's still up
                 if (overlay.style.display !== 'none') overlay.click(); 
                 else powerBtn.click(); 
             }
@@ -431,12 +557,17 @@
                 let prev = currentStationIndex === -1 ? stations.length - 1 : (currentStationIndex - 1 + stations.length) % stations.length;
                 playStation(prev);
             }
+            if (e.code === 'KeyM') {
+                toggleMute();
+            }
         });
 
         window.addEventListener('wheel', (e) => {
-            let newVol = masterVolume + (e.deltaY < 0 ? 0.05 : -0.05);
-            newVol = Math.max(0, Math.min(1, newVol));
-            setVolume(newVol);
+            if (!isMuted) {
+                let newVol = masterVolume + (e.deltaY < 0 ? 0.05 : -0.05);
+                newVol = Math.max(0, Math.min(1, newVol));
+                setVolume(newVol);
+            }
         });
 
         document.addEventListener("visibilitychange", () => {
@@ -461,8 +592,7 @@
             const n = prompt("Nazwa stacji:");
             const u = prompt("URL (MP3):");
             if (n && u) { 
-                // RESTORED CUSTOM PNG
-                stations.push({ id: Date.now(), name: n, img: "custom.png", src: u }); 
+                stations.push({ id: Date.now(), name: n, img: "custom.png", src: u, tracks: ["Audycja z zewnątrz"] }); 
                 localStorage.setItem('saved_stations', JSON.stringify(stations)); 
                 renderStations(); 
             }
